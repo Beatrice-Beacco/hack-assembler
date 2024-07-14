@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"assembler"
+	assembler "hack_assembler/src/main"
 	"os"
 	"testing"
 )

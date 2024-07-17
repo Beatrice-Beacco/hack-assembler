@@ -2,16 +2,18 @@ package assembler
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 )
 
 type Parser struct {
-	fileLines []string
-	count     int
-	Symbol    string
-	Dest      string
-	Comp      string
-	Jump      string
+	fileLines       []string
+	count           int
+	InstructionType InstructionType
+	Symbol          string
+	Dest            string
+	Comp            string
+	Jump            string
 }
 
 func NewParser(file *os.File) Parser {
@@ -57,5 +59,37 @@ func (p *Parser) Advance() {
 		return
 	}
 
+	nextLine := p.count + 1
+	instructionType, err := GetInstructionType(p.fileLines[nextLine])
+
+	if err != nil {
+		fmt.Printf("Error occurred while decoding instruction: %v", err)
+		return
+	}
+
+	p.InstructionType = instructionType
+
+	if p.InstructionType == A_INSTRUCTION {
+		p.resetCInstructionFields()
+		//TODO: sets as symbol xxx from @xxx
+	}
+
+	if p.InstructionType == L_INSTRUCTION {
+		p.resetCInstructionFields()
+		//TODO: sets as symbol xxx from (xxx)
+	}
+
 	// TODO:
+	if p.InstructionType == C_INSTRUCTION {
+		//TODO: set dest, comp, jump
+		p.Symbol = ""
+	}
+
+	p.count = nextLine
+}
+
+func (p *Parser) resetCInstructionFields() {
+	p.Dest = ""
+	p.Comp = ""
+	p.Jump = ""
 }

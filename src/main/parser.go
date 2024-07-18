@@ -51,41 +51,62 @@ func (p *Parser) HasMoreLines() bool {
 	return false
 }
 
-func (p *Parser) Advance() {
+func (p *Parser) Advance() error {
 	hasMoreLines := p.HasMoreLines()
 
 	//If there are no more lines don't advance
 	if !hasMoreLines {
-		return
+		return nil
 	}
 
+	//Fetch next line instruction
 	nextLine := p.count + 1
-	instructionType, err := GetInstructionType(p.fileLines[nextLine])
+	nextInstruction := p.fileLines[nextLine]
+	//Find instruction type
+	instructionType, err := GetInstructionType(nextInstruction)
 
 	if err != nil {
 		fmt.Printf("Error occurred while decoding instruction: %v", err)
-		return
+		return err
 	}
 
 	p.InstructionType = instructionType
 
 	if p.InstructionType == A_INSTRUCTION {
-		p.resetCInstructionFields()
-		//TODO: sets as symbol xxx from @xxx
+		symbol, err := GetAInstructionSymbol(nextInstruction)
+		if err != nil {
+			fmt.Printf("Error occurred while decoding instruction: %v", err)
+			return err
+		}
+		p.Symbol = symbol
+		p.resetCInstructionFields() //TODO: valutare se necessario
 	}
 
 	if p.InstructionType == L_INSTRUCTION {
-		p.resetCInstructionFields()
-		//TODO: sets as symbol xxx from (xxx)
+		symbol, err := GetLInstructionSymbol(nextInstruction)
+		if err != nil {
+			fmt.Printf("Error occurred while decoding instruction: %v", err)
+			return err
+		}
+		p.Symbol = symbol
+		p.resetCInstructionFields() //TODO: valutare se necessario
+
 	}
 
-	// TODO:
 	if p.InstructionType == C_INSTRUCTION {
-		//TODO: set dest, comp, jump
-		p.Symbol = ""
+		dest, comp, jump, err := GetCInstructionSymbols(nextInstruction)
+		if err != nil {
+			fmt.Printf("Error occurred while decoding instruction: %v", err)
+			return err
+		}
+		p.Dest = dest
+		p.Comp = comp
+		p.Jump = jump
 	}
 
+	//Set current line as next line
 	p.count = nextLine
+	return nil
 }
 
 func (p *Parser) resetCInstructionFields() {

@@ -1,104 +1,104 @@
 package tests
 
 import (
-	assembler "hack_assembler/src/main"
+	utils "hack_assembler/src/main/utils"
 	"testing"
 )
 
 func TestGetInstructionType(t *testing.T) {
 	t.Run("Returns numeric A_INSTRUCTION correctly", func(t *testing.T) {
 		command := "@16"
-		want := assembler.A_INSTRUCTION
-		got, err := assembler.GetInstructionType(command)
+		want := utils.A_INSTRUCTION
+		got, err := utils.GetInstructionType(command)
 		assertNotError(t, err)
 		assertEqualInstruction(t, got, want)
 	})
 	t.Run("Returns alfanumeric A_INSTRUCTION correctly", func(t *testing.T) {
 		command := "@variable"
-		want := assembler.A_INSTRUCTION
-		got, err := assembler.GetInstructionType(command)
+		want := utils.A_INSTRUCTION
+		got, err := utils.GetInstructionType(command)
 		assertNotError(t, err)
 		assertEqualInstruction(t, got, want)
 	})
 	t.Run("Returns numeric A_INSTRUCTION with spaces and comment correctly", func(t *testing.T) {
 		command := "  @16  //AAAAA"
-		want := assembler.A_INSTRUCTION
-		got, err := assembler.GetInstructionType(command)
+		want := utils.A_INSTRUCTION
+		got, err := utils.GetInstructionType(command)
 		assertNotError(t, err)
 		assertEqualInstruction(t, got, want)
 	})
 	t.Run("Returns numeric A_INSTRUCTION with spaces between correctly", func(t *testing.T) {
 		command := "@  16"
-		want := assembler.A_INSTRUCTION
-		got, err := assembler.GetInstructionType(command)
+		want := utils.A_INSTRUCTION
+		got, err := utils.GetInstructionType(command)
 		assertNotError(t, err)
 		assertEqualInstruction(t, got, want)
 	})
 
 	t.Run("Returns valid L_INSTRUCTION correctly", func(t *testing.T) {
 		command := "(LABEL)"
-		want := assembler.L_INSTRUCTION
-		got, err := assembler.GetInstructionType(command)
+		want := utils.L_INSTRUCTION
+		got, err := utils.GetInstructionType(command)
 		assertNotError(t, err)
 		assertEqualInstruction(t, got, want)
 	})
 	t.Run("Returns valid L_INSTRUCTION with spaces and comment correctly", func(t *testing.T) {
 		command := "  (LABEL)   //aaaa"
-		want := assembler.L_INSTRUCTION
-		got, err := assembler.GetInstructionType(command)
+		want := utils.L_INSTRUCTION
+		got, err := utils.GetInstructionType(command)
 		assertNotError(t, err)
 		assertEqualInstruction(t, got, want)
 	})
 	t.Run("Returns valid L_INSTRUCTION with spaces between correctly", func(t *testing.T) {
 		command := "(   LABEL  )"
-		want := assembler.L_INSTRUCTION
-		got, err := assembler.GetInstructionType(command)
+		want := utils.L_INSTRUCTION
+		got, err := utils.GetInstructionType(command)
 		assertNotError(t, err)
 		assertEqualInstruction(t, got, want)
 	})
 
 	t.Run("Returns valid C_INSTRUCTION correctly", func(t *testing.T) {
 		command := "D=D+1;JLE"
-		want := assembler.C_INSTRUCTION
-		got, err := assembler.GetInstructionType(command)
+		want := utils.C_INSTRUCTION
+		got, err := utils.GetInstructionType(command)
 		assertNotError(t, err)
 		assertEqualInstruction(t, got, want)
 	})
 
 	t.Run("Returns valid C_INSTRUCTION no comp correctly", func(t *testing.T) {
 		command := "D;JLE"
-		want := assembler.C_INSTRUCTION
-		got, err := assembler.GetInstructionType(command)
+		want := utils.C_INSTRUCTION
+		got, err := utils.GetInstructionType(command)
 		assertNotError(t, err)
 		assertEqualInstruction(t, got, want)
 	})
 
 	t.Run("Returns valid C_INSTRUCTION no jump correctly", func(t *testing.T) {
 		command := "D=D+1"
-		want := assembler.C_INSTRUCTION
-		got, err := assembler.GetInstructionType(command)
+		want := utils.C_INSTRUCTION
+		got, err := utils.GetInstructionType(command)
 		assertNotError(t, err)
 		assertEqualInstruction(t, got, want)
 	})
 
 	t.Run("Returns valid C_INSTRUCTION with spaces and comment correctly", func(t *testing.T) {
 		command := "  D=D+1;JLE   ///aaaaaaa"
-		want := assembler.C_INSTRUCTION
-		got, err := assembler.GetInstructionType(command)
+		want := utils.C_INSTRUCTION
+		got, err := utils.GetInstructionType(command)
 		assertNotError(t, err)
 		assertEqualInstruction(t, got, want)
 	})
 	t.Run("Returns valid C_INSTRUCTION with spaces between correctly", func(t *testing.T) {
 		command := "D  =  D  +  1  ;  JLE"
-		want := assembler.C_INSTRUCTION
-		got, err := assembler.GetInstructionType(command)
+		want := utils.C_INSTRUCTION
+		got, err := utils.GetInstructionType(command)
 		assertNotError(t, err)
 		assertEqualInstruction(t, got, want)
 	})
 
 	t.Run("Returns error when invalid instruction", func(t *testing.T) {
 		command := "asfghkh"
-		_, err := assembler.GetInstructionType(command)
+		_, err := utils.GetInstructionType(command)
 		assertError(t, err)
 	})
 }
@@ -106,53 +106,53 @@ func TestGetSymbols(t *testing.T) {
 	t.Run("Returns A_INSTRUCTION symbol correctly", func(t *testing.T) {
 		command := "@16"
 		want := "16"
-		got, err := assembler.GetAInstructionSymbol(command)
+		got, err := utils.GetAInstructionSymbol(command)
 		assertNotError(t, err)
 		assertEqualString(t, got, want)
 	})
 	t.Run("Returns A_INSTRUCTION symbol with spaces and comment correctly", func(t *testing.T) {
 		command := " @16  //comment!!!"
 		want := "16"
-		got, err := assembler.GetAInstructionSymbol(command)
+		got, err := utils.GetAInstructionSymbol(command)
 		assertNotError(t, err)
 		assertEqualString(t, got, want)
 	})
 	t.Run("Returns A_INSTRUCTION symbol with spaces between correctly", func(t *testing.T) {
 		command := " @ 16 "
 		want := "16"
-		got, err := assembler.GetAInstructionSymbol(command)
+		got, err := utils.GetAInstructionSymbol(command)
 		assertNotError(t, err)
 		assertEqualString(t, got, want)
 	})
 	t.Run("Returns error in invalid A_INSTRUCTION", func(t *testing.T) {
 		command := "@@16!!!!"
-		_, err := assembler.GetAInstructionSymbol(command)
+		_, err := utils.GetAInstructionSymbol(command)
 		assertError(t, err)
 	})
 	t.Run("Returns L_INSTRUCTION symbol correctly", func(t *testing.T) {
 		command := "(TEST)"
 		want := "TEST"
-		got, err := assembler.GetLInstructionSymbol(command)
+		got, err := utils.GetLInstructionSymbol(command)
 		assertNotError(t, err)
 		assertEqualString(t, got, want)
 	})
 	t.Run("Returns L_INSTRUCTION symbol with spaces and comment correctly", func(t *testing.T) {
 		command := "  (TEST)  //Comment!!!"
 		want := "TEST"
-		got, err := assembler.GetLInstructionSymbol(command)
+		got, err := utils.GetLInstructionSymbol(command)
 		assertNotError(t, err)
 		assertEqualString(t, got, want)
 	})
 	t.Run("Returns L_INSTRUCTION symbol with spaces between correctly", func(t *testing.T) {
 		command := "(  TEST  )"
 		want := "TEST"
-		got, err := assembler.GetLInstructionSymbol(command)
+		got, err := utils.GetLInstructionSymbol(command)
 		assertNotError(t, err)
 		assertEqualString(t, got, want)
 	})
 	t.Run("Returns error in invalid L_INSTRUCTION", func(t *testing.T) {
 		command := "(!!''XXX)"
-		_, err := assembler.GetLInstructionSymbol(command)
+		_, err := utils.GetLInstructionSymbol(command)
 		assertError(t, err)
 	})
 	t.Run("Returns C_INSTRUCTION symbols correctly", func(t *testing.T) {
@@ -160,7 +160,7 @@ func TestGetSymbols(t *testing.T) {
 		wantDest := "D"
 		wantComp := "D+1"
 		wantJump := "JLE"
-		gotDest, gotComp, gotJump, err := assembler.GetCInstructionSymbols(command)
+		gotDest, gotComp, gotJump, err := utils.GetCInstructionSymbols(command)
 		assertNotError(t, err)
 		assertEqualString(t, gotDest, wantDest)
 		assertEqualString(t, gotComp, wantComp)
@@ -171,7 +171,7 @@ func TestGetSymbols(t *testing.T) {
 		wantDest := "D"
 		wantComp := ""
 		wantJump := "JLE"
-		gotDest, gotComp, gotJump, err := assembler.GetCInstructionSymbols(command)
+		gotDest, gotComp, gotJump, err := utils.GetCInstructionSymbols(command)
 		assertNotError(t, err)
 		assertEqualString(t, gotDest, wantDest)
 		assertEqualString(t, gotComp, wantComp)
@@ -182,7 +182,7 @@ func TestGetSymbols(t *testing.T) {
 		wantDest := "D"
 		wantComp := "D+1"
 		wantJump := ""
-		gotDest, gotComp, gotJump, err := assembler.GetCInstructionSymbols(command)
+		gotDest, gotComp, gotJump, err := utils.GetCInstructionSymbols(command)
 		assertNotError(t, err)
 		assertEqualString(t, gotDest, wantDest)
 		assertEqualString(t, gotComp, wantComp)
@@ -193,7 +193,7 @@ func TestGetSymbols(t *testing.T) {
 		wantDest := "D"
 		wantComp := "D+1"
 		wantJump := "JLE"
-		gotDest, gotComp, gotJump, err := assembler.GetCInstructionSymbols(command)
+		gotDest, gotComp, gotJump, err := utils.GetCInstructionSymbols(command)
 		assertNotError(t, err)
 		assertEqualString(t, gotDest, wantDest)
 		assertEqualString(t, gotComp, wantComp)
@@ -204,7 +204,7 @@ func TestGetSymbols(t *testing.T) {
 		wantDest := "D"
 		wantComp := "D+1"
 		wantJump := "JLE"
-		gotDest, gotComp, gotJump, err := assembler.GetCInstructionSymbols(command)
+		gotDest, gotComp, gotJump, err := utils.GetCInstructionSymbols(command)
 		assertNotError(t, err)
 		assertEqualString(t, gotDest, wantDest)
 		assertEqualString(t, gotComp, wantComp)
@@ -212,12 +212,12 @@ func TestGetSymbols(t *testing.T) {
 	})
 	t.Run("Returns error in invalid C_INSTRUCTION", func(t *testing.T) {
 		command := "as;e=11+R;JJJ"
-		_, _, _, err := assembler.GetCInstructionSymbols(command)
+		_, _, _, err := utils.GetCInstructionSymbols(command)
 		assertError(t, err)
 	})
 }
 
-func assertEqualInstruction(t testing.TB, got, want assembler.InstructionType) {
+func assertEqualInstruction(t testing.TB, got, want utils.InstructionType) {
 	t.Helper()
 
 	if got != want {

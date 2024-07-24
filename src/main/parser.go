@@ -39,29 +39,23 @@ func (p *Parser) HasMoreLines() bool {
 	//If next line is NOT empty or comment, return true and exit loop
 	//If next line is empty or comment, increment count by 1 (set count = nextLine)
 	for p.count < len(p.fileLines)-1 {
-		nextLine := p.count + 1
-		line := p.fileLines[p.count]
-		isEmpty := IsEmptyLinePattern.MatchString(line)
-		isComment := IsCommentLinePattern.MatchString(line)
+		nextLineIndex := p.count + 1
+		nextLineInstruction := p.fileLines[nextLineIndex]
+		isEmpty := IsEmptyLinePattern.MatchString(nextLineInstruction)
+		isComment := IsCommentLinePattern.MatchString(nextLineInstruction)
 		if !isEmpty && !isComment {
 			return true
 		}
-		p.count = nextLine
+		p.count = nextLineIndex
 	}
 	return false
 }
 
 func (p *Parser) Advance() error {
-	hasMoreLines := p.HasMoreLines()
-
-	//If there are no more lines don't advance
-	if !hasMoreLines {
-		return nil
-	}
-
 	//Fetch next line instruction
 	nextLine := p.count + 1
 	nextInstruction := p.fileLines[nextLine]
+
 	//Find instruction type
 	instructionType, err := GetInstructionType(nextInstruction)
 

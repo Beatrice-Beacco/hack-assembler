@@ -5,41 +5,39 @@ import (
 	"strconv"
 )
 
-//TODO: traduco KBD, SCREEN R1, R2 etc...
-
-var builtInSymbols = map[string]int{
-	"R0":     0,
-	"R1":     1,
-	"R2":     2,
-	"R3":     3,
-	"R4":     4,
-	"R5":     5,
-	"R6":     6,
-	"R7":     7,
-	"R8":     8,
-	"R9":     9,
-	"R10":    10,
-	"R11":    11,
-	"R12":    12,
-	"R13":    13,
-	"R14":    14,
-	"R15":    15,
-	"SP":     0,
-	"LCL":    1,
-	"ARG":    2,
-	"THIS":   3,
-	"THAT":   4,
-	"SCREEN": 16384,
-	"KBD":    24576,
+var builtInSymbols = map[string]string{
+	"R0":     "0000000000000000",
+	"R1":     "0000000000000001",
+	"R2":     "0000000000000010",
+	"R3":     "0000000000000011",
+	"R4":     "0000000000000100",
+	"R5":     "0000000000000101",
+	"R6":     "0000000000000110",
+	"R7":     "0000000000000111",
+	"R8":     "0000000000001000",
+	"R9":     "0000000000001001",
+	"R10":    "0000000000001010",
+	"R11":    "0000000000001011",
+	"R12":    "0000000000001100",
+	"R13":    "0000000000001101",
+	"R14":    "0000000000001110",
+	"R15":    "0000000000001111",
+	"SP":     "0000000000000000",
+	"LCL":    "0000000000000001",
+	"ARG":    "0000000000000010",
+	"THIS":   "0000000000000011",
+	"THAT":   "0000000000000100",
+	"SCREEN": "0100000000000000",
+	"KBD":    "0110000000000000",
 }
 
 type SymbolTable struct {
 	nextAvailableAddress int
-	symbols              map[string]int
+	symbols              map[string]string
 }
 
 func NewSymbolTable() *SymbolTable {
-	symbolsMap := make(map[string]int)
+	symbolsMap := make(map[string]string)
 	for k, v := range builtInSymbols {
 		symbolsMap[k] = v
 	}
@@ -57,7 +55,7 @@ func (st *SymbolTable) AddEntry(symbol string) {
 	//If the symbol is numeric add entry "number": number (register number)
 	intSynbol, err := strconv.Atoi(symbol)
 	if err == nil {
-		st.symbols[symbol] = intSynbol
+		st.symbols[symbol] = intTo16BitBinary(intSynbol)
 		return
 	}
 
@@ -71,8 +69,8 @@ func (st *SymbolTable) AddEntry(symbol string) {
 		st.nextAvailableAddress++
 	}
 
-	st.symbols[symbol] = st.nextAvailableAddress //Set the symbol as the previously found next free register
-	st.nextAvailableAddress++                    //Increment the next free register address by 1 for the next entry
+	st.symbols[symbol] = intTo16BitBinary(st.nextAvailableAddress) //Set the symbol as the previously found next free register
+	st.nextAvailableAddress++                                      //Increment the next free register address by 1 for the next entry
 }
 
 func (st *SymbolTable) Contains(symbol string) bool {
@@ -86,6 +84,10 @@ func (st *SymbolTable) GetBinaryAddress(symbol string) string {
 	}
 
 	register := st.symbols[symbol]
-	binary := strconv.FormatInt(int64(register), 2)
+	return register
+}
+
+func intTo16BitBinary(intValue int) string {
+	binary := strconv.FormatInt(int64(intValue), 2)
 	return fmt.Sprintf("%016s", binary) //Pad with leading 0s until the length is 16 bits
 }

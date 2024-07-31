@@ -38,8 +38,12 @@ type SymbolTable struct {
 	symbols              map[string]int
 }
 
-func NewSymbolTable() SymbolTable {
-	return SymbolTable{nextAvailableAddress: 16, symbols: builtInSymbols}
+func NewSymbolTable() *SymbolTable {
+	symbolsMap := make(map[string]int)
+	for k, v := range builtInSymbols {
+		symbolsMap[k] = v
+	}
+	return &SymbolTable{nextAvailableAddress: 16, symbols: symbolsMap}
 }
 
 func (st *SymbolTable) AddEntry(symbol string) {
@@ -59,7 +63,11 @@ func (st *SymbolTable) AddEntry(symbol string) {
 
 	//If it's not numeric assign a register
 	//Increment the next available address until a free register is found
-	for _, ok := st.symbols[strconv.Itoa(st.nextAvailableAddress)]; ok; {
+	for {
+		_, nextAddressAlreadyUsed := st.symbols[strconv.Itoa(st.nextAvailableAddress)]
+		if !nextAddressAlreadyUsed {
+			break
+		}
 		st.nextAvailableAddress++
 	}
 

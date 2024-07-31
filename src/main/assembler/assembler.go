@@ -8,16 +8,16 @@ import (
 )
 
 type Assembler struct {
-	parser        Parser
+	parser        *Parser
 	codeConverter CodeConverter
-	symbolTable   SymbolTable
+	symbolTable   *SymbolTable
 }
 
-func NewAssembler(file *os.File) Assembler {
+func NewAssembler(file *os.File) *Assembler {
 	parser := NewParser(file)
 	symbolTable := NewSymbolTable()
 	codeConverter := CodeConverter{}
-	return Assembler{parser: parser, codeConverter: codeConverter, symbolTable: symbolTable}
+	return &Assembler{parser: parser, codeConverter: codeConverter, symbolTable: symbolTable}
 }
 
 func (a *Assembler) AssembleToFile(filePath string) {

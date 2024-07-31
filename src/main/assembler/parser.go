@@ -18,7 +18,7 @@ type Parser struct {
 	Jump                    string
 }
 
-func NewParser(file *os.File) Parser {
+func NewParser(file *os.File) *Parser {
 	defer file.Close()
 	fileScanner := bufio.NewScanner(file)
 	fileScanner.Split(bufio.ScanLines)
@@ -28,7 +28,7 @@ func NewParser(file *os.File) Parser {
 		fileLines = append(fileLines, fileScanner.Text())
 	}
 
-	return Parser{fileLines: fileLines}
+	return &Parser{fileLines: fileLines}
 }
 
 func (p *Parser) HasMoreLines() bool {

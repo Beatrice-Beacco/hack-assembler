@@ -95,3 +95,31 @@ func (c CodeConverter) JumpToBinary(jump string) (string, error) {
 
 	return binary, nil
 }
+
+func (c CodeConverter) CInstructionToBinary(comp, dest, jump string, loadFromAInstruction bool) (string, error) {
+	comp, errComp := c.CompToBinary(comp)
+
+	if errComp != nil {
+		return "", fmt.Errorf("an error occurred decoding the comp instruction %s: %v", comp, errComp)
+	}
+
+	dest, errDest := c.DestToBinary(dest)
+
+	if errDest != nil {
+		return "", fmt.Errorf("an error occurred decoding the dest instruction %s: %v", dest, errDest)
+	}
+
+	jump, errJump := c.JumpToBinary(jump)
+
+	if errJump != nil {
+		return "", fmt.Errorf("an error occurred decoding the jump instruction %s: %v", jump, errJump)
+	}
+
+	loadFromABit := "0"
+
+	if loadFromAInstruction {
+		loadFromABit = "1"
+	}
+
+	return fmt.Sprintf("111%s%s%s%s", loadFromABit, comp, dest, jump), nil //concatenate to form the 16 bit c instruction
+}

@@ -8,13 +8,14 @@ import (
 )
 
 type Parser struct {
-	fileLines       []string
-	count           int
-	InstructionType utils.InstructionType
-	Symbol          string
-	Dest            string
-	Comp            string
-	Jump            string
+	fileLines               []string
+	count                   int
+	InstructionType         utils.InstructionType
+	PreviousInstructionType utils.InstructionType
+	Symbol                  string
+	Dest                    string
+	Comp                    string
+	Jump                    string
 }
 
 func NewParser(file *os.File) Parser {
@@ -65,6 +66,8 @@ func (p *Parser) Advance() error {
 		return err
 	}
 
+	//Set previous instruction type and change current instruction type
+	p.PreviousInstructionType = p.InstructionType
 	p.InstructionType = instructionType
 
 	if p.InstructionType == utils.A_INSTRUCTION {
@@ -74,7 +77,6 @@ func (p *Parser) Advance() error {
 			return err
 		}
 		p.Symbol = symbol
-		p.resetCInstructionFields() //TODO: valutare se necessario
 	}
 
 	if p.InstructionType == utils.L_INSTRUCTION {
@@ -84,8 +86,6 @@ func (p *Parser) Advance() error {
 			return err
 		}
 		p.Symbol = symbol
-		p.resetCInstructionFields() //TODO: valutare se necessario
-
 	}
 
 	if p.InstructionType == utils.C_INSTRUCTION {
@@ -104,7 +104,11 @@ func (p *Parser) Advance() error {
 	return nil
 }
 
-func (p *Parser) resetCInstructionFields() {
+func (p *Parser) ResetParser() {
+	p.count = 0
+	p.InstructionType = ""
+	p.PreviousInstructionType = ""
+	p.Symbol = ""
 	p.Dest = ""
 	p.Comp = ""
 	p.Jump = ""

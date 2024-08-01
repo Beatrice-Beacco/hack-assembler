@@ -9,7 +9,8 @@ import (
 
 type Parser struct {
 	fileLines               []string
-	count                   int
+	fileLineCount           int
+	instructionCount        int
 	InstructionType         utils.InstructionType
 	PreviousInstructionType utils.InstructionType
 	Symbol                  string
@@ -33,29 +34,29 @@ func NewParser(file *os.File) *Parser {
 
 func (p *Parser) HasMoreLines() bool {
 	// if count >= fileLines.size return false
-	if p.count >= len(p.fileLines)-1 {
+	if p.fileLineCount >= len(p.fileLines)-1 {
 		return false
 	}
 	//While count < fileLines.size - 1
 	//Set count + 1 as next line index
 	//If next line is NOT empty or comment, return true and exit loop
 	//If next line is empty or comment, increment count by 1 (set count = nextLine)
-	for p.count < len(p.fileLines)-1 {
-		nextLineIndex := p.count + 1
+	for p.fileLineCount < len(p.fileLines)-1 {
+		nextLineIndex := p.fileLineCount + 1
 		nextLineInstruction := p.fileLines[nextLineIndex]
 		isEmpty := utils.IsEmptyLinePattern.MatchString(nextLineInstruction)
 		isComment := utils.IsCommentLinePattern.MatchString(nextLineInstruction)
 		if !isEmpty && !isComment {
 			return true
 		}
-		p.count = nextLineIndex
+		p.fileLineCount = nextLineIndex
 	}
 	return false
 }
 
 func (p *Parser) Advance() error {
 	//Fetch next line instruction
-	nextLine := p.count + 1
+	nextLine := p.fileLineCount + 1
 	nextInstruction := p.fileLines[nextLine]
 
 	//Find instruction type
@@ -66,8 +67,6 @@ func (p *Parser) Advance() error {
 		return err
 	}
 
-	//Set previous instruction type and change current instruction type
-	p.PreviousInstructionType = p.InstructionType
 	p.InstructionType = instructionType
 
 	if p.InstructionType == utils.A_INSTRUCTION {
@@ -100,14 +99,17 @@ func (p *Parser) Advance() error {
 	}
 
 	//Set current line as next line
-	p.count = nextLine
+	p.fileLineCount = nextLine
+	if p.InstructionType != utils.L_INSTRUCTION { //Don't count L instructions as binary instructions
+		p.instructionCount++
+	}
 	return nil
 }
 
 func (p *Parser) ResetParser() {
-	p.count = 0
+	p.fileLineCount = 0
+	p.instructionCount = 0
 	p.InstructionType = ""
-	p.PreviousInstructionType = ""
 	p.Symbol = ""
 	p.Dest = ""
 	p.Comp = ""

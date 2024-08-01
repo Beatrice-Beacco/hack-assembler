@@ -44,7 +44,7 @@ func NewSymbolTable() *SymbolTable {
 	return &SymbolTable{nextAvailableAddress: 16, symbols: symbolsMap}
 }
 
-func (st *SymbolTable) AddEntry(symbol string) {
+func (st *SymbolTable) AddSynbol(symbol string) {
 	//If the symbol is a built-in symbol skip add
 	_, ok := builtInSymbols[symbol]
 
@@ -72,6 +72,16 @@ func (st *SymbolTable) AddEntry(symbol string) {
 	st.symbols[symbol] = intTo16BitBinary(st.nextAvailableAddress) //Set the symbol as the previously found next free register
 	st.nextAvailableAddress++                                      //Increment the next free register address by 1 for the next entry
 }
+func (st *SymbolTable) AddEntry(symbol string, registerIndex int) {
+	//If the symbol is a built-in symbol skip add
+	_, ok := builtInSymbols[symbol]
+
+	if ok {
+		return
+	}
+
+	st.symbols[symbol] = intTo16BitBinary(registerIndex)
+}
 
 func (st *SymbolTable) Contains(symbol string) bool {
 	_, ok := st.symbols[symbol]
@@ -80,7 +90,7 @@ func (st *SymbolTable) Contains(symbol string) bool {
 
 func (st *SymbolTable) GetBinaryAddress(symbol string) string {
 	if !st.Contains(symbol) {
-		st.AddEntry(symbol)
+		st.AddSynbol(symbol)
 	}
 
 	register := st.symbols[symbol]

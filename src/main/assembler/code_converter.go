@@ -1,11 +1,14 @@
 package assembler
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 var compTable = map[string]string{
 	"0":   "101010",
 	"1":   "111111",
-	"-1":  "11101",
+	"-1":  "111010",
 	"D":   "001100",
 	"A":   "110000",
 	"M":   "110000",
@@ -36,10 +39,18 @@ var destTable = map[string]string{
 	"M":   "001",
 	"D":   "010",
 	"DM":  "011",
+	"MD":  "011",
 	"A":   "100",
 	"AM":  "101",
+	"MA":  "101",
 	"AD":  "110",
+	"DA":  "110",
 	"ADM": "111",
+	"AMD": "111",
+	"MAD": "111",
+	"MDA": "111",
+	"DAM": "111",
+	"DMA": "111",
 }
 var jumpTable = map[string]string{
 	"JGT": "001",
@@ -96,30 +107,39 @@ func (c CodeConverter) JumpToBinary(jump string) (string, error) {
 	return binary, nil
 }
 
-func (c CodeConverter) CInstructionToBinary(comp, dest, jump string, loadFromAInstruction bool) (string, error) {
-	comp, errComp := c.CompToBinary(comp)
+func (c CodeConverter) CInstructionToBinary(comp, dest, jump string) (string, error) {
+
+	//TODO: trovo un modo migliore
+	if len(comp) == 0 {
+		comp, dest = dest, comp
+	}
+
+	compBinary, errComp := c.CompToBinary(comp)
 
 	if errComp != nil {
 		return "", fmt.Errorf("an error occurred decoding the comp instruction %s: %v", comp, errComp)
 	}
 
-	dest, errDest := c.DestToBinary(dest)
+	destBinary, errDest := c.DestToBinary(dest)
 
 	if errDest != nil {
 		return "", fmt.Errorf("an error occurred decoding the dest instruction %s: %v", dest, errDest)
 	}
 
-	jump, errJump := c.JumpToBinary(jump)
+	jumpBinary, errJump := c.JumpToBinary(jump)
 
 	if errJump != nil {
 		return "", fmt.Errorf("an error occurred decoding the jump instruction %s: %v", jump, errJump)
 	}
 
-	loadFromABit := "0"
+	loadFromABit := canLoadFromABit(comp)
+	return fmt.Sprintf("111%s%s%s%s", loadFromABit, compBinary, destBinary, jumpBinary), nil //concatenate to form the 16 bit c instruction
+}
 
-	if loadFromAInstruction {
-		loadFromABit = "1"
+func canLoadFromABit(comp string) string {
+	if strings.Contains(comp, "M") {
+		return "1"
 	}
 
-	return fmt.Sprintf("111%s%s%s%s", loadFromABit, comp, dest, jump), nil //concatenate to form the 16 bit c instruction
+	return "0"
 }

@@ -22,7 +22,7 @@ func GetInstructionType(instruction string) (InstructionType, error) {
 	case IsLInstruction.MatchString(instruction):
 		return L_INSTRUCTION, nil
 	default:
-		return "", fmt.Errorf("invalid insruction %s", instruction)
+		return "", fmt.Errorf("invalid insruction: %s", instruction)
 	}
 }
 

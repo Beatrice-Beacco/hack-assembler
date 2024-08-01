@@ -1,6 +1,9 @@
 package tests
 
-import "testing"
+import (
+	"bytes"
+	"testing"
+)
 
 func assertNotError(t testing.TB, err error) {
 	t.Helper()
@@ -31,5 +34,13 @@ func assertEqualString(t testing.TB, got, want string) {
 
 	if got != want {
 		t.Fatalf("Expected %s, but got %s instead", want, got)
+	}
+}
+
+func assertEqualByteArray(t testing.TB, got, want []byte) {
+	t.Helper()
+
+	if !bytes.Equal(got, want) {
+		t.Fatalf("Expected\n%s\nBut got\n%s", want, got)
 	}
 }

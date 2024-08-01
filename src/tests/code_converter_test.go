@@ -69,7 +69,6 @@ func TestConverter(t *testing.T) {
 
 }
 
-// TODO: test 16 bit conversion
 func TestCInstructionComposition(t *testing.T) {
 	converter := assembler.CodeConverter{}
 
